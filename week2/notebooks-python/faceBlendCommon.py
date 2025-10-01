@@ -26,7 +26,7 @@ def getEightBoundaryPoints(h, w):
   boundaryPts.append((w/2, h-1))
   boundaryPts.append((0, h-1))
   boundaryPts.append((0, h/2))
-  return np.array(boundaryPts, dtype=np.float)
+  return np.array(boundaryPts, dtype=float)
 
 
 # Constrains points to be inside boundary
@@ -56,12 +56,12 @@ def similarityTransform(inPoints, outPoints):
   xin = c60*(inPts[0][0] - inPts[1][0]) - s60*(inPts[0][1] - inPts[1][1]) + inPts[1][0]
   yin = s60*(inPts[0][0] - inPts[1][0]) + c60*(inPts[0][1] - inPts[1][1]) + inPts[1][1]
 
-  inPts.append([np.int(xin), np.int(yin)])
+  inPts.append([int(xin), int(yin)])
 
   xout = c60*(outPts[0][0] - outPts[1][0]) - s60*(outPts[0][1] - outPts[1][1]) + outPts[1][0]
   yout = s60*(outPts[0][0] - outPts[1][0]) + c60*(outPts[0][1] - outPts[1][1]) + outPts[1][1]
 
-  outPts.append([np.int(xout), np.int(yout)])
+  outPts.append([int(xout), int(yout)])
 
   # Now we can use estimateRigidTransform for calculating the similarity transform.
   tform = cv2.estimateAffinePartial2D(np.array([inPts]), np.array([outPts]))
@@ -82,8 +82,8 @@ def normalizeImagesAndLandmarks(outSize, imIn, pointsIn):
     eyecornerSrc = [pointsIn[2], pointsIn[0]]
 
   # Corners of the eye in normalized image
-  eyecornerDst = [(np.int(0.3 * w), np.int(h/3)),
-                  (np.int(0.7 * w), np.int(h/3))]
+  eyecornerDst = [(int(0.3 * w), int(h/3)),
+                  (int(0.7 * w), int(h/3))]
 
   # Calculate similarity transform
   tform = similarityTransform(eyecornerSrc, eyecornerDst)
