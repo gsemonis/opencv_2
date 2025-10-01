@@ -1,2 +1,17 @@
 week1/data/facial_landmark_data/*
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Virtual envs
+.venv/
+env/
+venv/
+
+# OS files
+.DS_Store
+
+# IDE configs
+.vscode/
+.idea/
 
