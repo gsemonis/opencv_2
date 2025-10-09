@@ -38,7 +38,7 @@ deformedPoints = [5, 6, 8, 10, 11]
 
 # Setup the video stream
 # Change the argument to 0 to read from webcam
-cap = cv2.VideoCapture(DATA_PATH + "videos/sample-video.mp4")
+cap = cv2.VideoCapture(0)
 
 # Check if camera opened successfully
 if (cap.isOpened()== False):

@@ -9,8 +9,8 @@ RESIZE_HEIGHT = 360
 modelPath = MODEL_PATH + "shape_predictor_68_face_landmarks.dat"
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(modelPath)
-bulgeAmount = .75
-radius = 30
+bulgeAmount = .5
+radius = 25
 print("USAGE : python bugeyeVideo.py -b bulgeAmount ( default : .75 ) -r radius (radius around eye, default : 30 )")
 
 def barrel(src, k):
