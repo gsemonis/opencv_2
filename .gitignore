@@ -7,7 +7,7 @@ __pycache__/
 .venv/
 env/
 venv/
-
+week4/data/
 # OS files
 .DS_Store
 
