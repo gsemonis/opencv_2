@@ -1,3 +1,5 @@
+from pickletools import uint8
+
 import cv2
 import dlib
 import numpy as np
@@ -8,47 +10,20 @@ IMG_PATH   = r"C:\Users\Gabriel\OpenCv\Courses\opencv_2\project1-virtual-makeup\
 ORIGINAL_IMAGE_WINDOW = "original"
 AFTER_WINDOW = "after"
 
-def scale_and_clip_rect(x, y, w, h, scale, max_width, max_height):
-    cx = x + w / 2.0
-    cy = y + h / 2.0
-    # scale size
-    new_w = w * scale
-    new_h = h * scale
-    # compute new top-left
-    new_x = int(round(cx - new_w / 2.0))
-    new_y = int(round(cy - new_h / 2.0))
-    # clip to bounds
-    new_x = max(0, new_x)
-    new_y = max(0, new_y)
-    new_w = int(round(new_w))
-    new_h = int(round(new_h))
-    if new_x + new_w > max_width:
-        new_w = max_width - new_x
-    if new_y + new_h > max_height:
-        new_h = max_height - new_y
-    return new_x, new_y, new_w, new_h
-
-def create_iris_mask(image):
-    img_grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    img_grey = clahe.apply(img_grey)
-    img_grey = cv2.medianBlur(img_grey, 5)
-    circles = cv2.HoughCircles(img_grey, cv2.HOUGH_GRADIENT, dp=1.2, minDist=10, param1=80,param2=15,minRadius=10,maxRadius=100)
-    if circles is not None:
-        circles = np.uint16(np.around(circles[0]))
-        h,w = img_grey.shape
-        valid = [c for c in circles if 5 < c[0] < w - 5 and 5 < c[1] < h - 5]
-        if valid:
-            mid_y = h // 2
-            mid_x = w // 2
-            valid = sorted(valid, key=lambda c: ((c[0] - mid_x) ** 2 + (c[1] - mid_y) ** 2, c[2]))
-            pupil = valid[0]
-            iris = max(valid, key=lambda c: c[2])
-            cv2.circle(img_grey, (pupil[0], pupil[1]), pupil[2], 255, 2)
-            cv2.circle(img_grey, (iris[0], iris[1]), iris[2], 255, 2)
-
-    return img_grey
-
+def drawLandmarkPoints(image, points):
+    for i, (x,y) in enumerate(points):
+        cv2.circle(image, (int(x), int(y)), 20, (0,0,255), -1, lineType=cv2.LINE_AA)
+        cv2.putText(image, str(i), (int(x) + 3, int(y) - 3),
+                    cv2.FONT_HERSHEY_SIMPLEX, 3, (255,0,255), 3, cv2.LINE_AA)
+def alphaBlend(alpha, foreground, background):
+    a = (alpha.astype(np.float32) / 255.0)
+    a = cv2.merge([a,a,a])
+    fg = foreground.astype(np.float32)
+    bg = background.astype(np.float32)
+    fg = a * fg
+    bg = (1 - a) * bg
+    output = cv2.add(fg, bg)
+    return output.astype(np.uint8)
 def main():
     original = cv2.imread(IMG_PATH,cv2.IMREAD_UNCHANGED)
     if original is None:
@@ -70,32 +45,35 @@ def main():
     if faces is not None and len(faces) > 0:
         face = faces[0]
         shape = predictor(img_dlib, face)
-        points = np.array([(p.x, p.y) for p in shape.parts()], dtype=np.int32)
+        npoints = np.array([(p.x, p.y) for p in shape.parts()], dtype=np.int32)
 
-        img = img_dlib.copy()
-        height, width = img.shape[:2]
-        right_eye_mask = np.zeros(img.shape[:2], dtype=np.uint8)
-        left_eye_mask = np.zeros(img.shape[:2], dtype=np.uint8)
-        right_eye_polygon = np.array(points[36:42], dtype=np.int32)
-        right_eye_polygon = right_eye_polygon.reshape(-1, 1, 2)
-        left_eye_polygon = np.array(points[42:48], dtype=np.int32)
-        left_eye_polygon = left_eye_polygon.reshape(-1, 1, 2)
+        blush_color_rgb = (255, 102, 102)
+        blush_color_rgb = (0, 0, 255)
+        kernel_size = 543
+        blush_line_width = int(round(np.linalg.norm(npoints[1] - npoints[2])) // 2)
 
-        x, y, w, h = cv2.boundingRect(right_eye_polygon)
-        x, y, w, h = scale_and_clip_rect(x, y, w, h, 1.4, width, height)
-        cv2.rectangle(right_eye_mask, (x, y), (x + w, y + h), 255, -1)
-        right_eye = cv2.bitwise_and(img, img, mask=right_eye_mask)
-        right_iris_mask = create_iris_mask(right_eye[y : y + h, x : x + w,:])
+        img_rgb = img_dlib.copy()
+        height, width = img_rgb.shape[:2]
+        mask = np.zeros((height, width), dtype=np.uint8)
+        hull = cv2.convexHull(npoints)
+        cv2.fillConvexPoly(mask, hull, 255)
+        blush_lines = np.zeros((height, width), dtype=np.uint8)
+        blush_image = np.ones_like(img_rgb, np.uint8) * blush_color_rgb
 
-        x, y, w, h = cv2.boundingRect(left_eye_polygon)
-        x, y, w, h = scale_and_clip_rect(x, y, w, h, 1.4, width, height)
-        cv2.rectangle(left_eye_mask, (x, y), (x + w, y + h), 255, -1)
-        left_eye = cv2.bitwise_and(img, img, mask=left_eye_mask)
-        #left_iris_mask = create_iris_mask(left_eye[y : y + h, x : x + w,:])
+        cv2.line(blush_lines, npoints[2], npoints[30], 255, blush_line_width, cv2.LINE_AA)
+        cv2.line(blush_lines, npoints[14], npoints[30], 255, blush_line_width, cv2.LINE_AA)
 
-        cv2.imshow(ORIGINAL_IMAGE_WINDOW, img[:,:,::-1])
-        cv2.imshow("asdf", right_iris_mask)
-        #cv2.imshow(AFTER_WINDOW, right_iris_mask)
+        blush_lines = cv2.resize(blush_lines, (width // 2, height // 2))
+        blush_lines = cv2.GaussianBlur(blush_lines, (kernel_size, kernel_size), 0)
+        blush_lines = cv2.resize(blush_lines, (width, height))
+        blush_lines = cv2.bitwise_and(blush_lines, mask)
+
+        img_rgb = alphaBlend(blush_lines, blush_image, img_rgb)
+
+        img_bgr = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2BGR)
+
+        cv2.imshow(ORIGINAL_IMAGE_WINDOW, img_bgr)
+        cv2.imshow(AFTER_WINDOW, blush_lines)
         while True:
             if cv2.waitKey(5) & 0xFF == 27:
                 break
