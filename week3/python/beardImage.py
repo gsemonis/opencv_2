@@ -25,8 +25,8 @@ if __name__ == '__main__' :
   predictor = dlib.shape_predictor(modelPath)
 
   # Load the beard image and the target image
-  overlayFile = DATA_PATH + "images/beard1.png";
-  imageFile = DATA_PATH + "images/ted_cruz.jpg";
+  overlayFile = DATA_PATH + "images/beard1.png"
+  imageFile = r"C:\Users\Gabriel\Downloads\2QY3FJWY-102372.JPG"
 
   imgWithMask = cv2.imread(overlayFile,cv2.IMREAD_UNCHANGED)
   b,g,r,a = cv2.split(imgWithMask)
@@ -84,8 +84,8 @@ if __name__ == '__main__' :
   temp1 = np.multiply(targetImage, 1.0 - beardWarpedMask)
   temp2 = np.multiply(beardWarped, beardWarpedMask)
 
-  out = temp1 + temp2;
-  cv2.imshow("out",out);
+  out = temp1 + temp2
+  cv2.imshow("out",out)
   key = cv2.waitKey(0) & 0xFF
   if key == ord('s'):
-    cv2.imwrite("results/beardify.jpg", np.uint8(255*out))
+    cv2.imwrite(r"C:\Users\Gabriel\Downloads\aryn_beard.JPG", np.uint8(255*out))
