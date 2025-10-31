@@ -16,7 +16,7 @@ shapePredictor = dlib.shape_predictor(PREDICTOR_PATH)
 faceRecognizer = dlib.face_recognition_model_v1(FACE_RECOGNITION_MODEL_PATH)
 
 # load descriptors and index file generated during enrollment
-index = np.load('index.pkl')
+index = np.load('index.pkl', allow_pickle=True)
 faceDescriptorsEnrolled = np.load('descriptors.npy')
 
 # read image

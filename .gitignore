@@ -16,3 +16,5 @@ week4/data/
 .idea/
 *.jpg
 *.dat
+*.npy
+*.pkl
