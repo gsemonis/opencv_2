@@ -10,7 +10,7 @@ venv/
 week4/data/
 # OS files
 .DS_Store
-
+*/.ipynb_checkpoints/*
 # IDE configs
 .vscode/
 .idea/
@@ -18,3 +18,5 @@ week4/data/
 *.dat
 *.npy
 *.pkl
+*.JPEG
+*.npz
