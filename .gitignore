@@ -20,3 +20,6 @@ week4/data/
 *.pkl
 *.JPEG
 *.npz
+*.zip
+*.keras
+wget-log
