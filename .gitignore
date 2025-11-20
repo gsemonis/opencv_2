@@ -23,3 +23,9 @@ week4/data/
 *.zip
 *.keras
 wget-log
+.ipynb_checkpoints/*
+*.jpeg
+*.png
+*.JPG
+*.jfif
+*.PNG
