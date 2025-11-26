@@ -18,6 +18,7 @@ week4/data/
 *.dat
 *.npy
 *.pkl
+*.mp4
 *.JPEG
 *.npz
 *.zip
@@ -29,4 +30,6 @@ wget-log
 *.JPG
 *.jfif
 *.PNG
-week8/darknet/*
+project4/darknet/*
+project4/dataset/*
+project4/darknet/
