@@ -19,6 +19,7 @@ week4/data/
 *.npy
 *.pkl
 *.mp4
+*.avi
 *.JPEG
 *.npz
 *.zip
