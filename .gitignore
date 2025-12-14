@@ -34,3 +34,5 @@ wget-log
 project4/darknet/*
 project4/dataset/*
 project4/darknet/
+*.pb
+*.tar.gz
